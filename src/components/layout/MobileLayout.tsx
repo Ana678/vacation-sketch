@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import TabBar from "./TabBar";
+import Header from "./Header";
 
 interface MobileLayoutProps {
   children: ReactNode;
@@ -7,11 +7,11 @@ interface MobileLayoutProps {
 
 const MobileLayout = ({ children }: MobileLayoutProps) => {
   return (
-    <div className="min-h-screen bg-background pb-16">
-      <main className="max-w-screen-sm mx-auto">
+    <div className="min-h-screen bg-background">
+      <Header />
+      <main className="max-w-7xl mx-auto">
         {children}
       </main>
-      <TabBar />
     </div>
   );
 };

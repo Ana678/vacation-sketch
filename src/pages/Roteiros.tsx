@@ -1,103 +1,101 @@
-import { Plus, Calendar, Lock, Globe } from "lucide-react";
+import { Plus, Map, Edit, Trash2, ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 
 const Roteiros = () => {
-  const myItineraries = [
+  const roteiros = [
     {
       id: 1,
-      title: "Minha Viagem a Lisboa",
-      status: "Rascunho",
-      visibility: "Privado",
-      activities: 12,
-      days: 3,
-      icon: Lock,
+      title: "Lisboa Histórica",
+      description: "Pontos turísticos principais da capital",
+      activities: 8,
     },
     {
       id: 2,
-      title: "Praias do Sul",
-      status: "Completo",
-      visibility: "Público",
-      activities: 8,
-      days: 5,
-      icon: Globe,
+      title: "Praias do Algarve",
+      description: "Roteiro pelas melhores praias do sul",
+      activities: 12,
     },
   ];
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen p-4 sm:p-6 space-y-6">
       {/* Header */}
-      <div className="gradient-primary p-6 rounded-b-3xl shadow-medium">
-        <div className="flex items-center justify-between mb-4">
-          <h1 className="text-2xl font-bold text-primary-foreground">Meus Roteiros</h1>
-          <Button size="sm" variant="secondary" className="gap-2">
-            <Plus className="w-4 h-4" />
-            Novo
-          </Button>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold">Meus Roteiros</h1>
+          <p className="text-muted-foreground mt-1">
+            Crie e organize suas atividades de viagem
+          </p>
         </div>
-        <p className="text-primary-foreground/90 text-sm">
-          Crie e organize seus roteiros de viagem
-        </p>
+        <Link to="/roteiros/novo">
+          <Button className="gap-2">
+            <Plus className="w-4 h-4" />
+            <span className="hidden sm:inline">Novo Roteiro</span>
+          </Button>
+        </Link>
       </div>
 
       {/* Lista de roteiros */}
-      <div className="p-6 space-y-4">
-        {myItineraries.map((itinerary) => {
-          const Icon = itinerary.icon;
-          return (
-            <Card key={itinerary.id} className="p-4 shadow-soft hover:shadow-medium transition-smooth cursor-pointer">
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
-                  <Icon className="w-6 h-6 text-primary" />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {roteiros.map((roteiro) => (
+          <Card key={roteiro.id} className="p-5 hover:shadow-medium transition-smooth">
+            <div className="space-y-4">
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <h3 className="font-semibold text-lg mb-1">{roteiro.title}</h3>
+                  <p className="text-sm text-muted-foreground">{roteiro.description}</p>
                 </div>
-                
-                <div className="flex-1 space-y-2">
-                  <div className="flex items-start justify-between">
-                    <h3 className="font-semibold text-lg">{itinerary.title}</h3>
-                    <Badge 
-                      variant={itinerary.status === "Completo" ? "default" : "secondary"}
-                      className="text-xs"
-                    >
-                      {itinerary.status}
-                    </Badge>
-                  </div>
-                  
-                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                    <div className="flex items-center gap-1">
-                      <Calendar className="w-4 h-4" />
-                      <span>{itinerary.days} dias</span>
-                    </div>
-                    <span>•</span>
-                    <span>{itinerary.activities} atividades</span>
-                  </div>
-                  
-                  <Badge variant="outline" className="text-xs">
-                    {itinerary.visibility}
-                  </Badge>
+                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0 ml-3">
+                  <Map className="w-5 h-5 text-primary" />
                 </div>
               </div>
-            </Card>
-          );
-        })}
+              
+              <div className="flex items-center justify-between pt-2 border-t border-border">
+                <span className="text-sm text-muted-foreground">
+                  {roteiro.activities} atividades
+                </span>
+                
+                <div className="flex items-center gap-2">
+                  <Button variant="ghost" size="sm" className="gap-2">
+                    <Edit className="w-4 h-4" />
+                    Editar
+                  </Button>
+                  <Button variant="ghost" size="sm" className="gap-2">
+                    <ArrowRight className="w-4 h-4" />
+                    Converter
+                  </Button>
+                  <Button variant="ghost" size="sm">
+                    <Trash2 className="w-4 h-4 text-destructive" />
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </Card>
+        ))}
+      </div>
 
-        {/* Empty state */}
+      {/* Empty state */}
+      {roteiros.length === 0 && (
         <Card className="p-8 text-center space-y-4 border-dashed">
           <div className="w-16 h-16 rounded-full bg-muted mx-auto flex items-center justify-center">
             <Plus className="w-8 h-8 text-muted-foreground" />
           </div>
           <div>
-            <h3 className="font-semibold mb-2">Comece seu primeiro roteiro</h3>
+            <h3 className="font-semibold mb-2">Nenhum roteiro criado</h3>
             <p className="text-sm text-muted-foreground">
-              Crie roteiros personalizados para suas viagens
+              Crie seu primeiro roteiro com atividades para sua viagem
             </p>
           </div>
-          <Button className="gap-2">
-            <Plus className="w-4 h-4" />
-            Criar Roteiro
-          </Button>
+          <Link to="/roteiros/novo">
+            <Button className="gap-2">
+              <Plus className="w-4 h-4" />
+              Criar Primeiro Roteiro
+            </Button>
+          </Link>
         </Card>
-      </div>
+      )}
     </div>
   );
 };
