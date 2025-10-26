@@ -1,30 +1,56 @@
+import { useEffect, useState } from "react";
 import { Plus, Map, Calendar, MessageSquare } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 
 const Home = () => {
-  const recentItineraries = [
-    { id: 1, title: "Lisboa em 3 dias", days: 3, status: "Concluído" },
-    { id: 2, title: "Porto e Douro", days: 5, status: "Em andamento" },
-  ];
+  const { user } = useAuth();
+  const [stats, setStats] = useState({ roteiros: 0, itinerarios: 0 });
+  const [recentItineraries, setRecentItineraries] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!user) return;
+      
+      const [roteirosRes, itinerariosRes, recentRes] = await Promise.all([
+        supabase.from("roteiros").select("id", { count: "exact" }),
+        supabase.from("itinerarios").select("id", { count: "exact" }),
+        supabase.from("itinerarios").select("id, titulo, dias, status").order("created_at", { ascending: false }).limit(2),
+      ]);
+
+      setStats({
+        roteiros: roteirosRes.count || 0,
+        itinerarios: itinerariosRes.count || 0,
+      });
+
+      setRecentItineraries(recentRes.data || []);
+    };
+
+    fetchData();
+  }, [user]);
 
   const shortcuts = [
     { 
       icon: Plus, 
       label: "Criar Roteiro", 
-      path: "/roteiros/novo",
+      description: `${stats.roteiros} roteiros criados`,
+      path: "/roteiros",
       gradient: "gradient-primary"
     },
     { 
       icon: Calendar, 
       label: "Meus Itinerários", 
+      description: `${stats.itinerarios} itinerários planejados`,
       path: "/itinerarios",
       gradient: "gradient-hero"
     },
     { 
       icon: MessageSquare, 
       label: "Postagens", 
+      description: "Compartilhe suas viagens",
       path: "/postagens",
       gradient: "gradient-primary"
     },
@@ -73,28 +99,35 @@ const Home = () => {
           </Link>
         </div>
         <div className="space-y-3">
-          {recentItineraries.map((itinerary) => (
-            <Card key={itinerary.id} className="p-4 hover:shadow-medium transition-smooth">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                    <Map className="w-5 h-5 text-primary" />
+          {recentItineraries.length > 0 ? (
+            recentItineraries.map((itinerary) => (
+              <Card key={itinerary.id} className="p-4 hover:shadow-medium transition-smooth">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                      <Map className="w-5 h-5 text-primary" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold">{itinerary.titulo}</h3>
+                      <p className="text-sm text-muted-foreground">{itinerary.dias} dias</p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="font-semibold">{itinerary.title}</h3>
-                    <p className="text-sm text-muted-foreground">{itinerary.days} dias</p>
-                  </div>
+                  <span className={`text-xs px-2 py-1 rounded-full ${
+                    itinerary.status === "concluido" 
+                      ? "bg-secondary/20 text-secondary" 
+                      : "bg-accent/20 text-accent"
+                  }`}>
+                    {itinerary.status === "concluido" ? "Concluído" : 
+                     itinerary.status === "em_andamento" ? "Em andamento" : "Planejado"}
+                  </span>
                 </div>
-                <span className={`text-xs px-2 py-1 rounded-full ${
-                  itinerary.status === "Concluído" 
-                    ? "bg-secondary/20 text-secondary" 
-                    : "bg-accent/20 text-accent"
-                }`}>
-                  {itinerary.status}
-                </span>
-              </div>
+              </Card>
+            ))
+          ) : (
+            <Card className="p-4 text-center text-muted-foreground">
+              Nenhum itinerário criado ainda
             </Card>
-          ))}
+          )}
         </div>
       </div>
 
@@ -111,7 +144,7 @@ const Home = () => {
               Crie seu primeiro roteiro e comece a planejar
             </p>
           </div>
-          <Link to="/roteiros/novo">
+          <Link to="/roteiros">
             <Button className="gap-2">
               <Plus className="w-4 h-4" />
               Criar Roteiro

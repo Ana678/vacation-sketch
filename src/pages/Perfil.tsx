@@ -1,14 +1,41 @@
+import { useEffect, useState } from "react";
 import { User, Map, Calendar, MessageSquare, Settings, LogOut } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 
 const Perfil = () => {
-  const stats = [
-    { label: "Roteiros", value: 12, icon: Map },
-    { label: "Itinerários", value: 8, icon: Calendar },
-    { label: "Postagens", value: 24, icon: MessageSquare },
-  ];
+  const { user, signOut } = useAuth();
+  const [profile, setProfile] = useState<any>(null);
+  const [stats, setStats] = useState([
+    { label: "Roteiros", value: 0, icon: Map },
+    { label: "Itinerários", value: 0, icon: Calendar },
+    { label: "Postagens", value: 0, icon: MessageSquare },
+  ]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!user) return;
+      
+      const [profileRes, roteirosRes, itinerariosRes, publicacoesRes] = await Promise.all([
+        supabase.from("profiles").select("*").eq("id", user.id).single(),
+        supabase.from("roteiros").select("id", { count: "exact" }),
+        supabase.from("itinerarios").select("id", { count: "exact" }),
+        supabase.from("publicacoes").select("id", { count: "exact" }),
+      ]);
+
+      setProfile(profileRes.data);
+      setStats([
+        { label: "Roteiros", value: roteirosRes.count || 0, icon: Map },
+        { label: "Itinerários", value: itinerariosRes.count || 0, icon: Calendar },
+        { label: "Postagens", value: publicacoesRes.count || 0, icon: MessageSquare },
+      ]);
+    };
+
+    fetchData();
+  }, [user]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -19,7 +46,7 @@ const Perfil = () => {
             <Settings className="w-4 h-4" />
             <span className="hidden sm:inline">Configurações</span>
           </Button>
-          <Button variant="secondary" size="sm" className="gap-2">
+          <Button variant="secondary" size="sm" className="gap-2" onClick={signOut}>
             <LogOut className="w-4 h-4" />
             <span className="hidden sm:inline">Sair</span>
           </Button>
@@ -31,13 +58,13 @@ const Perfil = () => {
         <Card className="p-6 shadow-medium">
           <div className="flex flex-col items-center text-center space-y-4">
             <Avatar className="w-24 h-24 border-4 border-background">
-              <AvatarImage src="https://api.dicebear.com/7.x/avataaars/svg?seed=User" />
-              <AvatarFallback>U</AvatarFallback>
+              <AvatarImage src={profile?.avatar_url || undefined} />
+              <AvatarFallback>{profile?.nome?.[0] || "?"}</AvatarFallback>
             </Avatar>
             
             <div>
-              <h1 className="text-2xl font-bold">Nome do Usuário</h1>
-              <p className="text-muted-foreground">usuario@email.com</p>
+              <h1 className="text-2xl font-bold">{profile?.nome || "Usuário"}</h1>
+              <p className="text-muted-foreground">{user?.email}</p>
             </div>
 
             <Button variant="outline" size="sm">

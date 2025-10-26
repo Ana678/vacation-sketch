@@ -1,23 +1,78 @@
-import { Plus, Map, Edit, Trash2, ArrowRight } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Plus, Map, Edit, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+
+type Roteiro = {
+  id: string;
+  titulo: string;
+  descricao: string | null;
+  activities: number;
+};
 
 const Roteiros = () => {
-  const roteiros = [
-    {
-      id: 1,
-      title: "Lisboa Histórica",
-      description: "Pontos turísticos principais da capital",
-      activities: 8,
-    },
-    {
-      id: 2,
-      title: "Praias do Algarve",
-      description: "Roteiro pelas melhores praias do sul",
-      activities: 12,
-    },
-  ];
+  const [roteiros, setRoteiros] = useState<Roteiro[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    fetchRoteiros();
+  }, []);
+
+  const fetchRoteiros = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("roteiros")
+        .select(`
+          id,
+          titulo,
+          descricao,
+          atividades_roteiro(count)
+        `)
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+
+      const roteirosFormatted = data?.map((r: any) => ({
+        id: r.id,
+        titulo: r.titulo,
+        descricao: r.descricao,
+        activities: r.atividades_roteiro?.[0]?.count || 0,
+      })) || [];
+
+      setRoteiros(roteirosFormatted);
+    } catch (error: any) {
+      toast({
+        title: "Erro ao carregar roteiros",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    try {
+      const { error } = await supabase.from("roteiros").delete().eq("id", id);
+      if (error) throw error;
+      toast({ title: "Roteiro excluído com sucesso!" });
+      fetchRoteiros();
+    } catch (error: any) {
+      toast({
+        title: "Erro ao excluir roteiro",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
+  if (loading) {
+    return <div className="min-h-screen p-6">Carregando...</div>;
+  }
 
   return (
     <div className="min-h-screen p-4 sm:p-6 space-y-6">
@@ -44,8 +99,8 @@ const Roteiros = () => {
             <div className="space-y-4">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
-                  <h3 className="font-semibold text-lg mb-1">{roteiro.title}</h3>
-                  <p className="text-sm text-muted-foreground">{roteiro.description}</p>
+                  <h3 className="font-semibold text-lg mb-1">{roteiro.titulo}</h3>
+                  <p className="text-sm text-muted-foreground">{roteiro.descricao}</p>
                 </div>
                 <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0 ml-3">
                   <Map className="w-5 h-5 text-primary" />
@@ -62,11 +117,11 @@ const Roteiros = () => {
                     <Edit className="w-4 h-4" />
                     Editar
                   </Button>
-                  <Button variant="ghost" size="sm" className="gap-2">
-                    <ArrowRight className="w-4 h-4" />
-                    Converter
-                  </Button>
-                  <Button variant="ghost" size="sm">
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={() => handleDelete(roteiro.id)}
+                  >
                     <Trash2 className="w-4 h-4 text-destructive" />
                   </Button>
                 </div>

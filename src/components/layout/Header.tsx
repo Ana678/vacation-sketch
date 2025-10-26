@@ -1,8 +1,11 @@
 import { Link, useLocation } from "react-router-dom";
-import { Home, Map, Calendar, MessageSquare, User } from "lucide-react";
+import { Home, Map, Calendar, MessageSquare, User, LogOut } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { Button } from "@/components/ui/button";
 
 const Header = () => {
   const location = useLocation();
+  const { signOut } = useAuth();
   
   const navItems = [
     { path: "/", icon: Home, label: "Início" },
@@ -22,6 +25,10 @@ const Header = () => {
             <Map className="w-6 h-6 text-primary" />
             <h1 className="text-lg font-bold text-foreground hidden sm:block">Roteiros de Viagem</h1>
           </div>
+          
+          <Button variant="ghost" size="sm" onClick={signOut} className="ml-auto mr-4">
+            <LogOut className="w-4 h-4" />
+          </Button>
           
           <nav className="flex items-center gap-1 sm:gap-2">
             {navItems.map((item) => {

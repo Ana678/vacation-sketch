@@ -1,40 +1,73 @@
+import { useEffect, useState } from "react";
 import { Calendar, Clock, Star, Check } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+
+type Itinerario = {
+  id: string;
+  titulo: string;
+  local: string | null;
+  data_inicio: string;
+  dias: number;
+  activities: number;
+  status: string;
+};
 
 const Itinerarios = () => {
-  const itinerarios = [
-    {
-      id: 1,
-      title: "Lisboa em 3 dias",
-      location: "Lisboa, Portugal",
-      startDate: "15/03/2024",
-      days: 3,
-      activities: 12,
-      status: "concluido",
-      rating: 5,
-    },
-    {
-      id: 2,
-      title: "Porto e Douro",
-      location: "Porto, Portugal",
-      startDate: "22/03/2024",
-      days: 5,
-      activities: 18,
-      status: "em_andamento",
-    },
-    {
-      id: 3,
-      title: "Algarve Completo",
-      location: "Algarve, Portugal",
-      startDate: "05/04/2024",
-      days: 7,
-      activities: 20,
-      status: "planejado",
-    },
-  ];
+  const [itinerarios, setItinerarios] = useState<Itinerario[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    fetchItinerarios();
+  }, []);
+
+  const fetchItinerarios = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("itinerarios")
+        .select(`
+          id,
+          titulo,
+          local,
+          data_inicio,
+          dias,
+          status,
+          atividades_itinerario(count)
+        `)
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+
+      const itinerariosFormatted = data?.map((i: any) => ({
+        id: i.id,
+        titulo: i.titulo,
+        local: i.local,
+        data_inicio: new Date(i.data_inicio).toLocaleDateString("pt-BR"),
+        dias: i.dias,
+        activities: i.atividades_itinerario?.[0]?.count || 0,
+        status: i.status,
+      })) || [];
+
+      setItinerarios(itinerariosFormatted);
+    } catch (error: any) {
+      toast({
+        title: "Erro ao carregar itinerários",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return <div className="min-h-screen p-6">Carregando...</div>;
+  }
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -71,16 +104,16 @@ const Itinerarios = () => {
               <div className="p-4 space-y-3">
                 <div>
                   <div className="flex items-start justify-between mb-2">
-                    <h3 className="font-semibold text-lg line-clamp-1">{itinerario.title}</h3>
+                    <h3 className="font-semibold text-lg line-clamp-1">{itinerario.titulo}</h3>
                     {getStatusBadge(itinerario.status)}
                   </div>
-                  <p className="text-sm text-muted-foreground">{itinerario.location}</p>
+                  <p className="text-sm text-muted-foreground">{itinerario.local || "Local não definido"}</p>
                 </div>
                 
                 <div className="flex items-center gap-4 text-sm text-muted-foreground">
                   <div className="flex items-center gap-1">
                     <Clock className="w-4 h-4" />
-                    <span>{itinerario.days} dias</span>
+                    <span>{itinerario.dias} dias</span>
                   </div>
                   <span>•</span>
                   <span>{itinerario.activities} atividades</span>
@@ -88,14 +121,8 @@ const Itinerarios = () => {
                 
                 <div className="flex items-center justify-between pt-2 border-t border-border">
                   <span className="text-xs text-muted-foreground">
-                    Início: {itinerario.startDate}
+                    Início: {itinerario.data_inicio}
                   </span>
-                  {itinerario.status === "concluido" && itinerario.rating && (
-                    <div className="flex items-center gap-1">
-                      <Star className="w-4 h-4 fill-accent text-accent" />
-                      <span className="text-sm font-medium">{itinerario.rating}</span>
-                    </div>
-                  )}
                 </div>
               </div>
             </Card>
