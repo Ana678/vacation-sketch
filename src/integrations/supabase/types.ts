@@ -14,7 +14,364 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      atividades: {
+        Row: {
+          created_at: string
+          descricao: string | null
+          foto_url: string | null
+          id: string
+          local: string
+          nome: string
+        }
+        Insert: {
+          created_at?: string
+          descricao?: string | null
+          foto_url?: string | null
+          id?: string
+          local: string
+          nome: string
+        }
+        Update: {
+          created_at?: string
+          descricao?: string | null
+          foto_url?: string | null
+          id?: string
+          local?: string
+          nome?: string
+        }
+        Relationships: []
+      }
+      atividades_itinerario: {
+        Row: {
+          atividade_id: string
+          created_at: string
+          dia: number
+          horario: string | null
+          id: string
+          itinerario_id: string
+          ordem: number
+        }
+        Insert: {
+          atividade_id: string
+          created_at?: string
+          dia: number
+          horario?: string | null
+          id?: string
+          itinerario_id: string
+          ordem?: number
+        }
+        Update: {
+          atividade_id?: string
+          created_at?: string
+          dia?: number
+          horario?: string | null
+          id?: string
+          itinerario_id?: string
+          ordem?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "atividades_itinerario_atividade_id_fkey"
+            columns: ["atividade_id"]
+            isOneToOne: false
+            referencedRelation: "atividades"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "atividades_itinerario_itinerario_id_fkey"
+            columns: ["itinerario_id"]
+            isOneToOne: false
+            referencedRelation: "itinerarios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      atividades_roteiro: {
+        Row: {
+          atividade_id: string
+          created_at: string
+          id: string
+          ordem: number
+          roteiro_id: string
+        }
+        Insert: {
+          atividade_id: string
+          created_at?: string
+          id?: string
+          ordem?: number
+          roteiro_id: string
+        }
+        Update: {
+          atividade_id?: string
+          created_at?: string
+          id?: string
+          ordem?: number
+          roteiro_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "atividades_roteiro_atividade_id_fkey"
+            columns: ["atividade_id"]
+            isOneToOne: false
+            referencedRelation: "atividades"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "atividades_roteiro_roteiro_id_fkey"
+            columns: ["roteiro_id"]
+            isOneToOne: false
+            referencedRelation: "roteiros"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      avaliacoes: {
+        Row: {
+          atividade_id: string
+          comentario: string | null
+          created_at: string
+          id: string
+          itinerario_id: string
+          nota: number
+          user_id: string
+        }
+        Insert: {
+          atividade_id: string
+          comentario?: string | null
+          created_at?: string
+          id?: string
+          itinerario_id: string
+          nota: number
+          user_id: string
+        }
+        Update: {
+          atividade_id?: string
+          comentario?: string | null
+          created_at?: string
+          id?: string
+          itinerario_id?: string
+          nota?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "avaliacoes_atividade_id_fkey"
+            columns: ["atividade_id"]
+            isOneToOne: false
+            referencedRelation: "atividades"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "avaliacoes_itinerario_id_fkey"
+            columns: ["itinerario_id"]
+            isOneToOne: false
+            referencedRelation: "itinerarios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      comentarios: {
+        Row: {
+          created_at: string
+          id: string
+          publicacao_id: string
+          texto: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          publicacao_id: string
+          texto: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          publicacao_id?: string
+          texto?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comentarios_publicacao_id_fkey"
+            columns: ["publicacao_id"]
+            isOneToOne: false
+            referencedRelation: "publicacoes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      favoritos: {
+        Row: {
+          created_at: string
+          id: string
+          itinerario_id: string | null
+          roteiro_id: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          itinerario_id?: string | null
+          roteiro_id?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          itinerario_id?: string | null
+          roteiro_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "favoritos_itinerario_id_fkey"
+            columns: ["itinerario_id"]
+            isOneToOne: false
+            referencedRelation: "itinerarios"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "favoritos_roteiro_id_fkey"
+            columns: ["roteiro_id"]
+            isOneToOne: false
+            referencedRelation: "roteiros"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      itinerarios: {
+        Row: {
+          created_at: string
+          data_fim: string
+          data_inicio: string
+          descricao: string | null
+          dias: number | null
+          id: string
+          local: string | null
+          roteiro_id: string | null
+          status: string | null
+          titulo: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          data_fim: string
+          data_inicio: string
+          descricao?: string | null
+          dias?: number | null
+          id?: string
+          local?: string | null
+          roteiro_id?: string | null
+          status?: string | null
+          titulo: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          data_fim?: string
+          data_inicio?: string
+          descricao?: string | null
+          dias?: number | null
+          id?: string
+          local?: string | null
+          roteiro_id?: string | null
+          status?: string | null
+          titulo?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "itinerarios_roteiro_id_fkey"
+            columns: ["roteiro_id"]
+            isOneToOne: false
+            referencedRelation: "roteiros"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          id: string
+          nome: string
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          id: string
+          nome: string
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          id?: string
+          nome?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      publicacoes: {
+        Row: {
+          created_at: string
+          foto_url: string | null
+          id: string
+          texto: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          foto_url?: string | null
+          id?: string
+          texto: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          foto_url?: string | null
+          id?: string
+          texto?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      roteiros: {
+        Row: {
+          created_at: string
+          descricao: string | null
+          id: string
+          titulo: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          titulo: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          titulo?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
