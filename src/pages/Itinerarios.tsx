@@ -95,7 +95,7 @@ const Itinerarios = () => {
       {/* Lista de itinerários */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {itinerarios.map((itinerario) => (
-          <Link key={itinerario.id} to={`/itinerarios/${itinerario.id}`}>
+          <Link key={itinerario.id} to={`/itinerarios/${itinerario.id}/avaliar`}>
             <Card className="overflow-hidden hover:shadow-medium transition-smooth h-full">
               <div className="h-32 gradient-primary flex items-center justify-center">
                 <Calendar className="w-12 h-12 text-primary-foreground" />

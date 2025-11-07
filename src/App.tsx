@@ -7,6 +7,8 @@ import MobileLayout from "./components/layout/MobileLayout";
 import Home from "./pages/Home";
 import Roteiros from "./pages/Roteiros";
 import Itinerarios from "./pages/Itinerarios";
+import AvaliarItinerario from "./pages/AvaliarItinerario";
+import Avaliacoes from "./pages/Avaliacoes";
 import Social from "./pages/Social";
 import Perfil from "./pages/Perfil";
 import Auth from "./pages/Auth";
@@ -55,6 +57,20 @@ const App = () => (
             <ProtectedRoute>
               <MobileLayout>
                 <Itinerarios />
+              </MobileLayout>
+            </ProtectedRoute>
+          } />
+          <Route path="/itinerarios/:id/avaliar" element={
+            <ProtectedRoute>
+              <MobileLayout>
+                <AvaliarItinerario />
+              </MobileLayout>
+            </ProtectedRoute>
+          } />
+          <Route path="/avaliacoes" element={
+            <ProtectedRoute>
+              <MobileLayout>
+                <Avaliacoes />
               </MobileLayout>
             </ProtectedRoute>
           } />
