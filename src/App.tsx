@@ -6,7 +6,9 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import MobileLayout from "./components/layout/MobileLayout";
 import Home from "./pages/Home";
 import Roteiros from "./pages/Roteiros";
+import ConverterRoteiro from "./pages/ConverterRoteiro";
 import Itinerarios from "./pages/Itinerarios";
+import ExecutarItinerario from "./pages/ExecutarItinerario";
 import AvaliarItinerario from "./pages/AvaliarItinerario";
 import Avaliacoes from "./pages/Avaliacoes";
 import Social from "./pages/Social";
@@ -53,10 +55,24 @@ const App = () => (
               </MobileLayout>
             </ProtectedRoute>
           } />
+          <Route path="/roteiros/:id/converter" element={
+            <ProtectedRoute>
+              <MobileLayout>
+                <ConverterRoteiro />
+              </MobileLayout>
+            </ProtectedRoute>
+          } />
           <Route path="/itinerarios" element={
             <ProtectedRoute>
               <MobileLayout>
                 <Itinerarios />
+              </MobileLayout>
+            </ProtectedRoute>
+          } />
+          <Route path="/itinerarios/:id/executar" element={
+            <ProtectedRoute>
+              <MobileLayout>
+                <ExecutarItinerario />
               </MobileLayout>
             </ProtectedRoute>
           } />

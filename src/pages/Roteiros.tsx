@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { Plus, Map, Edit, Trash2 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Plus, Map, Edit, Trash2, ArrowRight } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
@@ -14,6 +14,7 @@ type Roteiro = {
 };
 
 const Roteiros = () => {
+  const navigate = useNavigate();
   const [roteiros, setRoteiros] = useState<Roteiro[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
@@ -113,9 +114,14 @@ const Roteiros = () => {
                 </span>
                 
                 <div className="flex items-center gap-2">
-                  <Button variant="ghost" size="sm" className="gap-2">
-                    <Edit className="w-4 h-4" />
-                    Editar
+                  <Button 
+                    variant="default" 
+                    size="sm" 
+                    className="gap-2"
+                    onClick={() => navigate(`/roteiros/${roteiro.id}/converter`)}
+                  >
+                    <ArrowRight className="w-4 h-4" />
+                    Converter
                   </Button>
                   <Button 
                     variant="ghost" 

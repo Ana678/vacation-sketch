@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { Calendar, Clock, Star, Check } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Calendar, Clock, Star, Check, Play } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -18,6 +18,7 @@ type Itinerario = {
 };
 
 const Itinerarios = () => {
+  const navigate = useNavigate();
   const [itinerarios, setItinerarios] = useState<Itinerario[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
@@ -95,38 +96,46 @@ const Itinerarios = () => {
       {/* Lista de itinerários */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {itinerarios.map((itinerario) => (
-          <Link key={itinerario.id} to={`/itinerarios/${itinerario.id}/avaliar`}>
-            <Card className="overflow-hidden hover:shadow-medium transition-smooth h-full">
-              <div className="h-32 gradient-primary flex items-center justify-center">
-                <Calendar className="w-12 h-12 text-primary-foreground" />
+          <Card key={itinerario.id} className="overflow-hidden hover:shadow-medium transition-smooth h-full">
+            <div className="h-32 gradient-primary flex items-center justify-center">
+              <Calendar className="w-12 h-12 text-primary-foreground" />
+            </div>
+            
+            <div className="p-4 space-y-3">
+              <div>
+                <div className="flex items-start justify-between mb-2">
+                  <h3 className="font-semibold text-lg line-clamp-1">{itinerario.titulo}</h3>
+                  {getStatusBadge(itinerario.status)}
+                </div>
+                <p className="text-sm text-muted-foreground">{itinerario.local || "Local não definido"}</p>
               </div>
               
-              <div className="p-4 space-y-3">
-                <div>
-                  <div className="flex items-start justify-between mb-2">
-                    <h3 className="font-semibold text-lg line-clamp-1">{itinerario.titulo}</h3>
-                    {getStatusBadge(itinerario.status)}
-                  </div>
-                  <p className="text-sm text-muted-foreground">{itinerario.local || "Local não definido"}</p>
+              <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                <div className="flex items-center gap-1">
+                  <Clock className="w-4 h-4" />
+                  <span>{itinerario.dias} dias</span>
                 </div>
-                
-                <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                  <div className="flex items-center gap-1">
-                    <Clock className="w-4 h-4" />
-                    <span>{itinerario.dias} dias</span>
-                  </div>
-                  <span>•</span>
-                  <span>{itinerario.activities} atividades</span>
-                </div>
-                
-                <div className="flex items-center justify-between pt-2 border-t border-border">
-                  <span className="text-xs text-muted-foreground">
-                    Início: {itinerario.data_inicio}
-                  </span>
-                </div>
+                <span>•</span>
+                <span>{itinerario.activities} atividades</span>
               </div>
-            </Card>
-          </Link>
+              
+              <div className="flex items-center justify-between pt-2 border-t border-border">
+                <span className="text-xs text-muted-foreground">
+                  Início: {itinerario.data_inicio}
+                </span>
+                {(itinerario.status === "planejado" || itinerario.status === "em_andamento") && (
+                  <Button
+                    size="sm"
+                    className="gap-2"
+                    onClick={() => navigate(`/itinerarios/${itinerario.id}/executar`)}
+                  >
+                    <Play className="w-4 h-4" />
+                    {itinerario.status === "planejado" ? "Começar" : "Continuar"}
+                  </Button>
+                )}
+              </div>
+            </div>
+          </Card>
         ))}
       </div>
 

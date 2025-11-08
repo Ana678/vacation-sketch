@@ -44,6 +44,7 @@ export type Database = {
       atividades_itinerario: {
         Row: {
           atividade_id: string
+          concluida: boolean
           created_at: string
           dia: number
           horario: string | null
@@ -53,6 +54,7 @@ export type Database = {
         }
         Insert: {
           atividade_id: string
+          concluida?: boolean
           created_at?: string
           dia: number
           horario?: string | null
@@ -62,6 +64,7 @@ export type Database = {
         }
         Update: {
           atividade_id?: string
+          concluida?: boolean
           created_at?: string
           dia?: number
           horario?: string | null
